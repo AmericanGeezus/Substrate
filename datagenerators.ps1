@@ -51,7 +51,7 @@ function Send-ToElma {
     $RequestValues = @{
     Method = "Post"
     ContentType = "application/json; charset=UTF-8"
-    URI = "http://elma:3000/foo"
+    URI = "https://geezus.net:3000/foo"
     }
 
     $Combined = @()
@@ -152,7 +152,7 @@ Get-CimInstance -ClassName Win32_LogicalDisk |`
 }
 
 
-function Get-ProcessInformation {
+function Get-ProcessInfo {
 
 Get-Process | Group-Object -Property ProcessName |
 
@@ -161,7 +161,7 @@ Get-Process | Group-Object -Property ProcessName |
                      @{n="R";e={($_.Group|? Responding -eq $true).count}},
                      @{n="U";e={($_.Group|? Responding -eq $false).count}},
                      @{n="Description";e={($_.Group|Select Description -First 1).Description}},
-                     @{n="Avg.UpTime(H)";e={Measure-Round -Num ((($_.Group|Select StartTime | %{Measure-TimeSpan -Date $_.StartTime}).TotalHours | Measure-Object -Average).Average)}},
+                     @{n="AvgUpTime(H)";e={Measure-Round -Num ((($_.Group|Select StartTime | %{Measure-TimeSpan -Date $_.StartTime}).TotalHours | Measure-Object -Average).Average)}},
                      @{n = "WS(MB)"; e = {[MATH]::ROUND(($_.Group|Measure-Object WorkingSet -sum).sum / 1MB , 2) }}|
               Sort-Object -Property "Instances" -Descending 
 
@@ -210,14 +210,127 @@ Get-LocalUser | Select Name,@{n="sid";e={($_.SID).value}} | ConvertTo-Json
 }
 
 
+function Get-RDPSessions($serverNames){
+if(!($serverNames)){
+$serverNames = "localhost"}
+foreach ($servername in $servernames){
+$session = qwinsta /server:$ServerName | foreach { (($_.trim() -replace "\s+",","))} | Convertfrom-csv
+$session | Add-Member -MemberType NoteProperty -Name Server -Value $servername
+$allSessions += $session
+}
+$allSessions | group -property "server"
+}
+
+
+function Get-TitledWindows {
+
+Get-Process | Where {$_.MainWindowTitle} | Select-Object ProcessName, MainWindowTitle
+
+}
+
 function Do-allTheThings {
 Get-ActiveTCP | Send-ToElma
 Get-DriveInfo | Send-ToElma
 Get-LocalUsers | Send-ToElma
 Get-NetworkAdapterInfo | Send-ToElma
 Get-NetworkTotalTraffic | Send-ToElma
-Get-ProcessInformation | Send-ToElma
+Get-ProcessInfo | ConvertTo-Json | Send-ToElma
+Get-RDPSessions | Send-ToElma -SendEach
+Get-TitledWindows | ConvertTo-Json | Send-ToElma
 }
+
+
+function Start-HostNetMonitor {
+   param(
+   #IP, URL, Hostname.
+   [parameter(Mandatory=$true)]
+   $target,
+   #Sleep time between pings, in seconds.
+   [parameter(Mandatory=$true)]
+   [INT]$sleepSeconds,
+   #Where to send the log, uses temp directory if none supplied.
+   $logPath,
+   #Specific port to monitor
+   $port
+   )
+
+
+Class PingResult 
+{
+    [DateTime]$DateTime
+    [int]$latency
+    [string]$targetIP
+    [string]$targetPort
+    [String]$Outcome
+
+
+}
+
+
+$global:ProgressPreference = 'SilentlyContinue'
+if ($logPath -eq $null){
+  $logPath = "$env:TEMP\HostMonitorLog$(Get-Date -Format "yyyy-MM-d-HHmm").txt"
+  Write-Host "No Logpath provided, writing log to $logPath"
+  
+  }
+
+While ($true){
+
+
+if ($PSBoundParameters.ContainsKey('port')){
+$WarningPreference 
+$Ping = Test-NetConnection -Port $port -ComputerName $target -WarningAction Ignore
+    if ($Ping.TcpTestSucceeded -eq $true){
+    $result = New-Object PingResult
+    $result.DateTime = Get-Date -Format s
+    $result.latency = $((Test-NetConnection -ComputerName $target -InformationAction SilentlyContinue).PingReplyDetails.RoundtripTime)
+    $result.Outcome = $ping.TcpTestSucceeded
+    $result.targetIP = $ping.RemoteAddress
+    $result.targetPort = $ping.RemotePort
+
+    $result | ft -HideTableHeaders
+    $str = "$($result.DateTime),$($result.targetIP),$($result.targetPort),$($result.latency),Success"
+    }else{$str = "[$(Get-Date -Format s)], $($Ping.RemoteAddress):$($Ping.RemotePort), NAN Failed`r" }
+    }
+
+else { 
+$ping = Test-NetConnection -ComputerName $target 
+
+$result = New-Object PingResult
+    $result.DateTime = Get-Date -Format s
+    $result.latency = $ping.PingReplyDetails.RoundtripTime
+    $result.Outcome = $ping.TcpTestSucceeded
+    $result.targetIP = $ping.RemoteAddress
+    $result.targetPort = $ping.RemotePort
+
+
+    $str = "[$(Get-Date -Format s)], $($Ping.RemoteAddress), $(($ping.PingReplyDetails).RoundtripTime)ms, $(($ping.PingReplyDetails).Status)`r"
+
+}
+
+if($ping.PingReplyDetails.Status -eq "Success" -or $Ping.TcpTestSucceeded -eq $true) {
+Write-Host $str -BackgroundColor DarkGreen -ForegroundColor White
+}
+else{
+Write-Host $str -BackgroundColor Red -ForegroundColor White
+}
+
+$message = @{"msg" = $str} | ConvertTo-Json
+
+
+ $RequestValues = @{
+    Method = "Post"
+    ContentType = "application/json; charset=UTF-8"
+    URI = "https://geezus.net:3000/stream"
+    Body = $message
+ }
+
+Invoke-WebRequest @RequestValues 
+Add-Content -Value $str -Path $logPath
+
+Start-Sleep -Seconds $sleepSeconds
+
+}}
 
 
 #  ██╗  ██╗███████╗██╗     ██████╗ ███████╗██████╗                           
@@ -241,5 +354,4 @@ function Measure-TimeSpan ([DateTime]$Date){
 function Measure-Round([decimal]$Num){
 [Math]::Round($Num,2)
 }
-
 
