@@ -333,6 +333,371 @@ Start-Sleep -Seconds $sleepSeconds
 }}
 
 
+#  ███╗   ███╗███████╗██╗     ██╗███████╗███████╗ █████╗          
+#  ████╗ ████║██╔════╝██║     ██║██╔════╝██╔════╝██╔══██╗         
+#  ██╔████╔██║█████╗  ██║     ██║███████╗███████╗███████║         
+#  ██║╚██╔╝██║██╔══╝  ██║     ██║╚════██║╚════██║██╔══██║         
+#  ██║ ╚═╝ ██║███████╗███████╗██║███████║███████║██║  ██║         
+#  ╚═╝     ╚═╝╚══════╝╚══════╝╚═╝╚══════╝╚══════╝╚═╝  ╚═╝         
+#                                                                 
+#   ██████╗ ██████╗ ███╗   ██╗████████╗██████╗ ██╗██████╗ ███████╗
+#  ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██║██╔══██╗██╔════╝
+#  ██║     ██║   ██║██╔██╗ ██║   ██║   ██████╔╝██║██████╔╝███████╗
+#  ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██║██╔══██╗╚════██║
+#  ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║██║██████╔╝███████║
+#   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝
+#                                                                 
+
+
+
+function Get-MostRecentServices {
+    [CmdletBinding()]
+    param (
+        [string]$Name,
+        [int]$Number
+    )   
+    $Params = @{}
+    if ($PSBoundParameters.Name) {
+        $Params.Filter = "Name = '$Name'"
+    }
+    if (!($PSBoundParameters.Number)){
+        $Number = 25
+    }
+    $Services = Get-CimInstance -ClassName Win32_Service @Params
+    $Output = foreach ($Service in $Services) {
+        $Process = Get-Process -Id $Service.ProcessId
+        [pscustomobject]@{
+            
+            Name = $Service.Name
+            DisplayName = $Service.DisplayName
+		    Status = $Service.State
+            StartTime = $Process.StartTime.DateTime
+       } | Where {$_.StartTime -ne $null} 
+	}
+	$Output | sort -property starttime | select -first $Number | convertto-json
+}
+
+#example:
+#Get-MostRecentServices -Number 10 | send-toElma
+
+
+function Get-MostRecentlyInstalledPrograms ($Number) {
+    if(!($Number)){
+        $Number = 25}
+    "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*", "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
+    ForEach-Object {Get-ItemProperty $_} | Where-Object {$_.DisplayName -ne $null} |
+    Sort-Object -Property InstallDate -Descending | Select-Object DisplayName, DisplayVersion, @{Name="InstallDate"; e={[datetime]::ParseExact($_.InstallDate,”yyyyMMdd”,$null).toshortdatestring()}} | Select-Object -First $number | ConvertTo-Json
+}
+
+#example:
+#Get-MostRecentlyInstalledPrograms 20 | Send-ToElma
+
+
+function Get-MostRecentRestarts ($Number) {
+    if(!($Number)){
+        $Number = 25}
+	$xml=@'
+	<QueryList>
+		<Query Id="0" Path="System">
+			<Select Path="System">*[System[(EventID=1074)]]</Select>
+		</Query>
+	</QueryList>
+'@
+	Get-WinEvent -FilterXml $xml -MaxEvents $Number | Select @{n="Time of Restart Event"; e={$_.TimeCreated.DateTime}}, RecordID, @{n="User SID"; e={$_.UserID.Value}}, Message | Group-Object -Property "User SID"
+}
+
+#example:
+#Get-MostRecentRestarts 10 | Send-ToElma -SendEach
+
+
+function Get-StartupItems {
+    Get-WMIObject Win32_StartupCommand | Select-Object -Property @{n="Startup Item Description"; e={$_.Description}}, Command, User, Location | ConvertTo-Json
+}
+
+#example:
+#Get-StartupItems | Send-ToElma
+
+
+function Get-FirewallRules {
+	$Rules=(New-object -ComObject HNetCfg.FWPolicy2).rules
+	$Rules |
+	Where-Object {$_.enabled} |
+	Sort-Object -Property direction |
+	Select-Object -Property name, description, ApplicationName, ServiceName, Protocol, LocalPorts, RemotePorts, LocalAddresses, RemoteAddresses, ICMPType, Direction, Action | ConvertTo-Json
+}
+
+#example:
+#Get-FirewallRules | Send-ToElma
+
+
+function Get-Hotfixes {
+	Get-HotFix | Select-Object -Property @{Name="Hotfix ID"; Expression={$_.hotfixID}}, @{Name="Installed By"; Expression={$_.InstalledBy}}, @{Name="Installed On"; Expression={$_.installedon.datetime}} | ConvertTo-Json
+}
+
+#example:
+#Get-Hotfixes | Send-ToElma
+
+
+function Get-GPSCoords($sampleSeconds){
+    if(!($sampleSeconds)){
+    $sampleSeconds = 3
+    }
+	Add-Type -AssemblyName System.Device
+	$geowatcher = New-Object System.Device.Location.GeoCoordinateWatcher 
+	$geowatcher.start()
+	start-sleep -s 1
+	for ($i=1; $i -le $sampleSeconds; $i++)
+	{
+		start-sleep -s 1
+		$geowatcher | select @{n="Timestamp";e={$_.Position.Timestamp.DateTime.DateTime}}, @{n="Latitude";e={$_.Position.Location.Latitude}},@{n="Longitude";e={$_.Position.Location.Longitude}}, @{n="Altitude";e={$_.Position.Location.Altitude}}, @{n="Horizontal Accuracy";e={$_.Position.Location.HorizontalAccuracy}}, @{n="Speed";e={$_.Position.Location.Speed}}, @{n="Course";e={$_.Position.Location.Course}}, @{n="Is Unknown";e={$_.Position.Location.IsUnknown}}
+	}
+	$geowatcher.stop()
+}
+
+#example:
+#GetGPSCoords 5 | ConvertTo-Json | Send-ToElma
+
+
+function Get-DriverQuery {
+    driverquery /fo csv | convertfrom-csv | group "driver type"
+}
+
+#example:
+#Get-DriverQuery | Send-ToElma -SendEach
+
+
+###Dependency: Win8/Server2k12 or later###
+
+function Get-ScheduledTasks {
+	Get-ScheduledTask | Where {$_.State -ne "Disabled"} | Select TaskName, Description, State, Date | ConvertTo-Json
+}
+
+#example:
+#Get-ScheduledTasks | Send-ToElma
+
+
+###Dependency: Active Directory###
+
+function Get-MostRecentADUsersGrouped ($Number) {
+    if(!($Number)){
+        $Number = 25}
+    $date = get-date
+    $User = Get-ADUser -Filter 'objectclass -eq "User"' -Properties *
+    $User | Where-Object {$_.whenCreated -gt $date.adddays(-30) -and ($_.LastLogonDate -ne $null)} | Select-Object  -last $Number |
+    Sort-Object -Descending -Property LastLogonDate |
+    Select @{n="Created"; e={$_.whenCreated.DateTime}},@{n="Last Logon Date"; e={$_.LastLogonDate.DateTime}},Enabled,@{n="SID"; e={$_.SID.Value}},Name,Samaccountname | Group-Object -Property "Name"
+}
+
+#example:
+#Get-MostRecentADUsersGrouped 10 | Send-ToElma -SendEach
+
+
+function Get-AllGPOForDomain($domainName){
+    Get-GPO -All -Domain $domainName | Select DisplayName, DomainName, Owner, ID, GpoStatus, @{n="Creation Time";e={$_.CreationTime.DateTime}}, @{n="Modification Time";e={$_.ModificationTime.DateTime}}, @{n="User DS Version";e={$_.User.DSVersion}}, @{n="User Sysvol Version";e={$_.User.Sysvolversion}} | ConvertTo-Json
+}
+
+#example:
+#Get-AllGPOForDomain phoenix.caw | Send-ToElma
+
+
+###Dependency: Hyper-V###
+
+function Get-HyperVBasics {
+	Get-VM * | Select VMName, State, Status, Path, ProcessorCount, MemoryStartup, Generation | ConvertTo-Json
+}
+
+#example:        
+#Get-HyperVBasics | Send-ToElma
+
+
+function Get-HyperVReplication {
+	Get-VM * | Select VMName, State, Status, ReplicationState, ReplicationHealth  | ConvertTo-Json
+}
+
+#example:
+#Get-HyperVReplication | Send-ToElma
+
+
+###Dependency: OpenManage Server Administrator###
+
+function Get-FanSpeed($computername) {
+        if(!($computername)){
+        	$computername = "localhost"
+	}
+        Get-WmiObject cim_tachometer -Namespace root\cimv2\dell -Computer $computername | Select-Object Name, CurrentReading | ConvertTo-Json
+}
+
+#example:
+#Get-FanSpeed "localhost" | Send-ToElma
+
+
+function Get-RAIDPhysicalInfoFromOMSA{
+    $disks = @()
+    $storage = & "C:\Program Files\Dell\SysMgt\oma\bin\omreport.exe" storage pdisk controller=0
+    foreach ($line in $storage)
+    {
+        # ID
+        if(($line) -like "ID*")
+        {
+            $disk = New-Object System.Object
+            $line = $line.split(":")[1..3].Replace(" ","")
+            $line = $line[0],$line[1],$line[2] -join ":"
+            $disk | Add-Member -MemberType NoteProperty -Name ID -Value $line
+        }
+        	# Product ID
+        if(($line) -like "Product ID*")
+        {
+            $line = $line.Split(":")[1].Trim()
+            $disk | Add-Member -MemberType NoteProperty -Name "Product ID" -Value $line
+        }
+        # Status
+        if(($line) -like "Status*")
+        {
+            $line = $line.Split(":")[1].Replace(" ","")
+            $disk | Add-Member -MemberType NoteProperty -Name Status -Value $line
+        }
+	    # Media
+	    if(($line) -like "Media*")
+	    {
+	        $line = $line.Split(":")[1].Replace(" ","")
+            $disk | Add-Member -MemberType NoteProperty -Name Media -Value $line
+    	}
+        # Serial No.
+	    if(($line) -like "Serial No.*")
+	    {
+	        $line = $line.Split(":")[1].Replace(" ","")
+            $disk | Add-Member -MemberType NoteProperty -Name "Serial No." -Value $line
+	    }
+	    # Failure Predicted
+	    if(($line) -like "Failure Predicted*")
+	    {
+	        $line = $line.Split(":")[1].Replace(" ","")
+            $disk | Add-Member -MemberType NoteProperty -Name "Failure Predicted" -Value $line
+	    }
+        # State
+        if(($line) -like "State*")
+        {
+            $line = $line.Split(":")[1].Replace(" ","")
+            $disk | Add-Member -MemberType NoteProperty -Name State -Value $line
+            $disks += $disk
+        }
+           
+    }
+    $disks | ConvertTo-Json
+    }
+
+#example:
+#Get-RAIDPhysicalInfoFromOMSA | Send-ToElma
+
+
+function Get-RAIDVirtualInfoFromOMSA {
+    $disks = @()
+    $storage = & "C:\Program Files\Dell\SysMgt\oma\bin\omreport.exe" storage vdisk
+    foreach ($line in $storage)
+    {
+	# ID
+    if(($line) -like "ID*")
+        {
+	        $disk = New-Object System.Object
+            $line = $line.Split(":")[1].Trim()
+            $disk | Add-Member -MemberType NoteProperty -Name "ID" -Value $line
+        }
+    # Status
+    if(($line) -like "Status*")
+        {
+            $line = $line.Split(":")[1].Replace(" ","")
+            $disk | Add-Member -MemberType NoteProperty -Name Status -Value $line
+        }
+	# Name
+	if(($line) -like "Name*")
+	{
+		    $line = $line.Split(":")[1].Replace(" ","")
+       		$disk | Add-Member -MemberType NoteProperty -Name Name -Value $line
+	}
+	# Layout
+	if(($line) -like "Layout*")
+	{
+		    $line = $line.Split(":")[1].Replace(" ","")
+       		$disk | Add-Member -MemberType NoteProperty -Name "Layout" -Value $line
+	}
+	# Size
+	if(($line) -like "Size*")
+	{
+		    $line = $line.Split(":")[1].Trim()
+        	$disk | Add-Member -MemberType NoteProperty -Name "Size" -Value $line
+	}
+	# Read Policy
+    if(($line) -like "Read Policy*")
+        {
+            $line = $line.Split(":")[1].Trim()
+            $disk | Add-Member -MemberType NoteProperty -Name "Read Policy" -Value $line
+        }
+	# Write Policy
+    if(($line) -like "Write Policy*")
+        {
+            $line = $line.Split(":")[1].Trim()
+            $disk | Add-Member -MemberType NoteProperty -Name "Write Policy" -Value $line
+        }
+    # State
+    if(($line) -like "State*")
+        {
+            $line = $line.Split(":")[1].Replace(" ","")
+            $disk | Add-Member -MemberType NoteProperty -Name State -Value $line
+            $disks += $disk
+        }
+           
+    }
+    $disks | ConvertTo-Json
+    }
+
+#example:
+#Get-RAIDVirtualInfoFromOMSA | Send-ToElma
+
+
+function Do-TooManyOfTheThings {
+        Get-RAIDPhysicalInfoFromOMSA | Send-ToElma
+        Get-RAIDVirtualInfoFromOMSA | Send-ToElma
+        Get-ActiveTCP | Send-ToElma
+        Get-DriveInfo | Send-ToElma
+        Get-LocalUsers | Send-ToElma
+        Get-NetworkAdapterInfo | Send-ToElma
+        Get-NetworkTotalTraffic | Send-ToElma
+        Get-ProcessInfo | Send-ToElma
+        Get-BIOSInfo | Send-ToElma
+        Get-FanSpeed | Send-ToElma
+        Get-HyperVReplication | Send-ToElma
+        Get-HyperVBasics | Send-ToElma
+        Get-FirewallRules | Send-ToElma
+        Get-Hotfixes | Send-ToElma
+        Get-ScheduledTasks | Send-ToElma
+        Get-MostRecentEventLogs 10 | Send-ToElma
+        Get-StartupItems | Send-ToElma
+        Get-MostRecentADUsersGrouped 30 | Send-ToElma -SendEach
+        Get-MostRecentRestarts 30 | Send-ToElma -SendEach
+        Get-MostRecentServices -number 10 | Send-ToElma
+        Get-FilesLastModified -minutes "-3600" -numberOfFiles 0 -filePath "C:\\*.*" | Send-ToElma -SendEach
+        Get-RDPSessions "phoenix-hv1","phoenix-mabs","ashandruin","boxensocks" | Send-ToElma -SendEach
+        Get-DriverQuery | Send-ToElma -SendEach
+    }
+
+function Do-TooManyOfTheThingsInWin7 {
+        Get-DriveInfo | Send-ToElma
+        Get-LocalUsers | Send-ToElma
+        Get-ProcessInfo | Send-ToElma
+        Get-BIOSInfo | Send-ToElma
+        Get-FirewallRules | Send-ToElma
+        Get-Hotfixes | Send-ToElma
+        Get-MostRecentEventLogs 10 | Send-ToElma
+        Get-StartupItems | Send-ToElma
+        Get-MostRecentADUsersGrouped 30 | Send-ToElma -SendEach
+        Get-MostRecentRestarts 30 | Send-ToElma -SendEach
+        Get-MostRecentServices -number 10 | Send-ToElma
+        Get-FilesLastModified -minutes "-3600" -numberOfFiles 0 -filePath "C:\\*.*" | Send-ToElma -SendEach
+        Get-RDPSessions "phoenix-hv1","phoenix-mabs","ashandruin","boxensocks" | Send-ToElma -SendEach
+        Get-DriverQuery | Send-ToElma -SendEach
+    }
+
+
 #  ██╗  ██╗███████╗██╗     ██████╗ ███████╗██████╗                           
 #  ██║  ██║██╔════╝██║     ██╔══██╗██╔════╝██╔══██╗                          
 #  ███████║█████╗  ██║     ██████╔╝█████╗  ██████╔╝                          
