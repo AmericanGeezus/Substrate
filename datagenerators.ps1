@@ -407,7 +407,7 @@ function Get-MostRecentRestarts ($Number) {
 		</Query>
 	</QueryList>
 '@
-	Get-WinEvent -FilterXml $xml -MaxEvents $Number | Select @{n="Time of Restart Event"; e={$_.TimeCreated.DateTime}}, RecordID, @{n="User SID"; e={$_.UserID.Value}}, Message | Group-Object -Property "User SID"
+	Get-WinEvent -FilterXml $xml -MaxEvents $Number | Select @{n="RestartTime"; e={$_.TimeCreated.DateTime}}, RecordID, @{n="UserSID"; e={$_.UserID.Value}}, @{n="UserName"; e={$(Get-localuser -sid $_.UserID.Value).name}}, Message | Group-Object -Property "UserSID"
 }
 
 #example:
