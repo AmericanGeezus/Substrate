@@ -38,7 +38,8 @@ function Send-ToElma {
     [parameter(ValueFromPipeline=$false)]
     [Switch]$Convert,
     [parameter(ValueFromPipeline=$false)]
-    [Switch]$SendEach
+    [Switch]$SendEach,
+    $port = 3000
     )
     begin{
     $SwitchPrompt = @"
@@ -47,12 +48,15 @@ function Send-ToElma {
     3 - Continue processing any remaining items in the pipe.
     4 - Break pipeline, send nothing.
 "@
-
+    
+   
     $RequestValues = @{
     Method = "Post"
     ContentType = "application/json; charset=UTF-8"
-    URI = "https://geezus.net:3000/foo"
+    URI = "https://geezus.net:$($port)/push"
     }
+
+    
 
     $Combined = @()
 
@@ -228,16 +232,7 @@ Get-Process | Where {$_.MainWindowTitle} | Select-Object ProcessName, MainWindow
 
 }
 
-function Do-allTheThings {
-Get-ActiveTCP | Send-ToElma
-Get-DriveInfo | Send-ToElma
-Get-LocalUsers | Send-ToElma
-Get-NetworkAdapterInfo | Send-ToElma
-Get-NetworkTotalTraffic | Send-ToElma
-Get-ProcessInfo | ConvertTo-Json | Send-ToElma
-Get-RDPSessions | Send-ToElma -SendEach
-Get-TitledWindows | ConvertTo-Json | Send-ToElma
-}
+
 
 
 function Start-HostNetMonitor {
@@ -331,6 +326,7 @@ Add-Content -Value $str -Path $logPath
 Start-Sleep -Seconds $sleepSeconds
 
 }}
+
 
 
 #  ███╗   ███╗███████╗██╗     ██╗███████╗███████╗ █████╗          
