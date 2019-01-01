@@ -470,6 +470,26 @@ function Get-DriverQuery {
 #Get-DriverQuery | Send-ToElma -SendEach
 
 
+function Get-PendingWindowsUpdates{
+    $updateSession = New-Object -ComObject Microsoft.Update.Session
+    $updateSession.ClientApplicationID = 'MSDN Sample Script'
+    $updateSearcher = $updateSession.CreateUpdateSearcher()
+    $updateResults = $updateSearcher.Search('IsInstalled=0')
+    $updateResults.updates | select Title,Description,IsDownloaded,IsHidden,IsInstalled,IsMandatory,@{n="Last Deployment Change Time";e={$_.LastDeploymentChangeTime.DateTime}},SupportUrl,RebootRequired | ConvertTo-Json
+}
+
+#example:
+#Get-PendingWindowsUpdates | Send-ToElma
+
+
+function Get-PowerScheme{
+    Get-WmiObject -Namespace root\cimv2\power -Class win32_PowerPlan |Select-Object -Property ElementName, IsActive | ConvertTo-Json
+}
+
+#example:
+#Get-PowerScheme | Send-ToElma
+
+
 ###Dependency: Win8/Server2k12 or later###
 
 function Get-ScheduledTasks {
@@ -502,6 +522,15 @@ function Get-AllGPOForDomain($domainName){
 
 #example:
 #Get-AllGPOForDomain phoenix.caw | Send-ToElma
+
+
+function Get-DNSRecords ($DNSServerName, $DomainName) {
+    $DomainFilter = "DomainName = '" + $DomainName + "'"
+    Get-WmiObject -Class MicrosoftDNS_AType -NameSpace Root\MicrosoftDNS -ComputerName $DNSServerName -filter $DomainFilter | select -property IPAddress, OwnerName, @{n="Timestamp";e={(([datetime]"1.1.1601").AddHours($_.Timestamp)).datetime}}, ttl | convertto-json
+}
+
+#example:
+#Get-DNSRecords -DNSServerName "ASHANDRUIN" -DomainName 'phoenix.caw' | Send-ToElma
 
 
 ###Dependency: Hyper-V###
@@ -656,7 +685,6 @@ function Get-RAIDVirtualInfoFromOMSA {
 
 #example:
 #Get-RAIDVirtualInfoFromOMSA | Send-ToElma
-
 
 function Do-TooManyOfTheThings {
         Get-RAIDPhysicalInfoFromOMSA | Send-ToElma
