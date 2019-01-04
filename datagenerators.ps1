@@ -493,7 +493,7 @@ function Get-PowerScheme{
 ###Dependency: Win8/Server2k12 or later###
 
 function Get-ScheduledTasks {
-	Get-ScheduledTask | Where {$_.State -ne "Disabled"} | Select TaskName, Description, State, Date | ConvertTo-Json
+	Get-ScheduledTask | Where {$_.State -ne "Disabled"} | Select TaskName, Description, @{n="State";e={[Enum]::GetName([Microsoft.Powershell.Cmdletization.GeneratedTypes.ScheduledTask.StateEnum],($_.psbase.CimInstanceProperties['state'].value))}}, Date | ConvertTo-Json
 }
 
 #example:
