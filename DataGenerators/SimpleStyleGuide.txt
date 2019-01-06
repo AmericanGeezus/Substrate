@@ -1,0 +1,7 @@
+All functions should be placed into the category ps1 file located in the public directory. 
+How I have them placed now is not meant as an absolute. 
+Please feel free to open discussion on better classification for individual items, add whole categories, etc.
+
+Final outputs should avoid having property names containing special charectors or spaces. 
+Function naming should generally follow Microsofts approved verb's documentation linked here
+https://docs.microsoft.com/en-us/powershell/developer/cmdlet/approved-verbs-for-windows-powershell-commands
