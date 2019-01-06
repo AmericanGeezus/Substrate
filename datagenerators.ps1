@@ -551,6 +551,16 @@ function Get-HyperVReplication {
 #Get-HyperVReplication | Send-ToElma
 
 
+function Get-HyperVNetworkTraffic([string]$hv,[int]$SampleInterval,[int]$MaxSamples) {
+    if(!($hv)){
+        $hv = "localhost"}
+	get-counter "Hyper-V Virtual Network Adapter(*)\packets/sec" -computername $hv -SampleInterval $SampleInterval -MaxSamples $MaxSamples | Select -expandproperty CounterSamples | Select @{Name="Timestamp";e={$_.Timestamp.DateTime}},InstanceName,CookedValue, @{Name="Counter";Expression={$_.Path.Split("\")[-1]}} | Group-Object -Property Timestamp
+}
+
+#example:
+#Get-HyperVNetworkTraffic "PHOENIX-HV1" 2 5 | Send-ToElma -SendEach
+
+
 ###Dependency: OpenManage Server Administrator###
 
 function Get-FanSpeed($computername) {
@@ -699,6 +709,7 @@ function Do-TooManyOfTheThings {
         Get-FanSpeed | Send-ToElma
         Get-HyperVReplication | Send-ToElma
         Get-HyperVBasics | Send-ToElma
+	Get-HyperVNetworkTraffic "PHOENIX-HV1" 2 5 | Send-ToElma -SendEach
         Get-FirewallRules | Send-ToElma
         Get-Hotfixes | Send-ToElma
         Get-ScheduledTasks | Send-ToElma
