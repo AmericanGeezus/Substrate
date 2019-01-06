@@ -218,7 +218,8 @@ function Get-RDPSessions($serverNames){
 if(!($serverNames)){
 $serverNames = "localhost"}
 foreach ($servername in $servernames){
-$session = qwinsta /server:$ServerName | foreach { (($_.trim() -replace "\s+",","))} | Convertfrom-csv
+$cmd = "qwinsta /server:" + $ServerName + " 2>`$null"
+        $session = invoke-expression -erroraction silentlycontinue $cmd | foreach { (($_.trim() -replace "\s+",","))} | Convertfrom-csv
 $session | Add-Member -MemberType NoteProperty -Name Server -Value $servername
 $allSessions += $session
 }
