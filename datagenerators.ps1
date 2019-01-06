@@ -599,7 +599,7 @@ function Get-RAIDPhysicalInfoFromOMSA{
 	    if(($line) -like "Serial No.*")
 	    {
 	        $line = $line.Split(":")[1].Replace(" ","")
-            $disk | Add-Member -MemberType NoteProperty -Name "Serial No." -Value $line
+            $disk | Add-Member -MemberType NoteProperty -Name "SerialNumber" -Value $line
 	    }
 	    # Failure Predicted
 	    if(($line) -like "Failure Predicted*")
