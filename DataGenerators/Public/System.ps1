@@ -202,6 +202,21 @@ function Get-PowerScheme{
 #example:
 #Get-PowerScheme | Send-ToElma
 
+function Get-HostnameHistory{
+	foreach ($line in (Get-Content "C:\Windows\debug\netsetup.log")) {
+		If (($line.substring(($line.length - 19), 19)) -match "is valid for type 1"){
+			[pscustomobject]@{
+            
+            		Hostname = (($line.substring(0, $line.length - 21))).substring(48)
+			DateTime = ($line.substring(0,24))
+       			}			
+		}
+	}
+}
+
+#example:
+#Get-HostnameHistory | ConvertTo-Json | Send-ToElma
+
 
 ###Dependency: Win8/Server2k12 or later###
 
