@@ -226,3 +226,20 @@ function Get-ScheduledTasks {
 
 #example:
 #Get-ScheduledTasks | Send-ToElma
+
+function Get-LockKeyStatus{
+	Add-Type -MemberDefinition @'
+	[DllImport("user32.dll")] 
+	public static extern short GetKeyState(int nVirtKey);
+'@ -Name keyboardfuncs -Namespace user32
+
+	$lockStatuses = [PSCustomObject]@{    
+		NumberLock = $(if ([console]::NumberLock){"On"}else{"Off"})
+		CapsLock = $(if ([console]::CapsLock){"On"}else{"Off"})
+		ScrollLock = $(if ([user32.keyboardfuncs]::GetKeyState(0x91)){"On"}else{"Off"})
+	}
+	$lockStatuses | ConvertTo-Json
+}
+
+#example:
+#Get-LockKeyStatus | Send-ToElma
