@@ -29,6 +29,7 @@ function Get-ActiveTCP([switch]$GroupItems){
 
 
 $connections = Get-NetTCPConnection | where {($_.AppliedSetting -eq "Internet") -and ($_.RemoteAddress -cnotlike "127.0.*")} | Select RemoteAddress, LocalPort, RemotePort,`
+@{n="HostName";e={$(Get-DNSHostEntry -ip $_.RemoteAddress)}},`
 @{n="State";e={$([Enum]::GetName([Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetTCPConnection.State],($_.PSBase.CimInstanceProperties['State'].Value)))}},`
 @{n="OwningProcess";e={$(Get-Process -Id $_.OwningProcess).Name}},
 @{n="PID";e={$_.OwningProcess}}
