@@ -1,0 +1,376 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: monospace;
+    height: 100%;
+    background: var(--bg-primalt);
+    color: white;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+div.navBar p {
+    font-size: 15;
+    color: var(--theme-bright);
+    background: black;
+    width: 33%;
+    display: inline-block;
+    margin: 0;
+    top: 4.2em;
+    position: absolute;
+    z-index: 0;
+    left: 0.8em;
+}
+
+:root {
+    --theme-pink: #a50377;
+    --theme-green: #23a503;
+    --theme-gtnw: #102D75;
+    --border-gradient: linear-gradient(to bottom, var(--theme-dark) 26%, var(--theme-bright) 81%, var(--theme-bright) 100%);
+    --theme-term: #1f1500;
+}
+
+button.theme {
+    width: 1em;
+    height: 1em;
+    margin: .4rem;
+    border-style: solid;
+    border-width: .01rem;
+    border-color: var(--text-primary);
+    outline: none;
+    display: inline-block;
+    position: relative;
+}
+
+#green {
+    background: var(--theme-green);
+}
+
+#pink {
+    background: var(--theme-pink);
+}
+
+#gtnw {
+    background: var(--theme-gtnw)
+}
+
+button#redBlue {
+    background: linear-gradient(to bottom, #b10000 26%, #000fc5 100%);
+    transform: rotate(90deg);
+}
+
+button#term{
+    background: var(--theme-term);
+}
+
+.themeButton {
+    height: 1em;
+    float: right;
+    margin: .4rem;
+    overflow: hidden;
+    margin-right: 0.1rem;
+    margin-top: 0;
+}
+
+.tooltip-wrapper {
+    position: absolute;
+    visibility: hidden;
+    width: 1em;
+    opacity: 0;
+}
+
+div.themeButton:hover .tooltip-wrapper {
+    visibility: visible;
+    transition: opacity 1s .5s;
+    opacity: 1;
+}
+
+p.tooltip {
+    z-index: 3;
+    display: inline-block;
+    position: relative;
+    left: -0.9rem;
+    text-align: center;
+    bottom: 1.4em;
+    background-color: #000000;
+    transition: background-color 1s;
+    width: 50px;
+    border-radius: 5px;
+    border: 1px solid var(--theme-dark);
+    font-size: 15;
+    margin: 0;
+}
+
+p.toolTip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 53%;
+    margin-left: -9.4px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+
+p.toolTip.tall {
+    z-index: 3;
+    bottom: 2.5em;
+}
+
+table {
+    height: fit-content;
+    color: var(--text-primary);
+    /* background : var(--bg-primary); */
+}
+
+table.table thead>tr {
+    border-bottom: 2px dotted var(--theme-dark);
+}
+
+div#cardContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12em, 2fr));
+    grid-template-rows: repeat(12, 12em);
+    grid-auto-rows: 12em;
+    grid-auto-flow: row dense;
+    grid-gap: 1.4rem;
+    margin: 1.2rem auto;
+    width: 94%;
+}
+
+.main {
+    display: block;
+    width: 100%;
+    overflow-y: scroll;
+    height: 90%;
+    background: var(--bg-darkBlue);
+    margin-top: 0.6em;
+    border: 0.1rem solid var(--theme-dark);
+    border-right: .1rem solid var(--theme-dark);
+}
+
+div#cardContainer>div {
+    box-shadow: 4px 6px 4px 1px black;
+    border-radius: 0.2em;
+    background: var(--bg-primalt);
+    border: .2em var(--theme-dark) solid;
+    border-right: 0.2em solid var(--theme-dark);
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+th {
+    text-align: left;
+    max-width: 125px;
+    overflow-wrap: normal;
+    overflow: hidden;
+    white-space: pre;
+    font-size: 17px;
+}
+
+td {
+    font-size: 14px;
+    max-width: 147px;
+    overflow-y: auto;
+    white-space: normal;
+    max-height: 1em;
+    vertical-align: top;
+    word-break: break-word;
+}
+
+/* tableCard */
+
+div.tableCard {
+    grid-column-end: span 3;
+    overflow-y: scroll;
+    /* max-height: 12.1em; */
+    overflow-x: hidden;
+    counter-reset: rows;
+}
+
+table.table {
+    width: 100%;
+    overflow-y: scroll;
+    display: table;
+    padding: .4em;
+    table-layout: auto;
+    border-collapse: collapse;
+}
+
+div.tableCard tbody>tr {
+    /* border-bottom: 2px dotted var(--theme-bright); */
+}
+
+div.tableCard tbody>tr:nth-child(even) {
+    background: var(--bg-primary)
+}
+
+div.tableCard td {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+.tableCard th {
+    text-align: left;
+    overflow-wrap: normal;
+    overflow: hidden;
+    white-space: pre;
+    font-size: 16px;
+    vertical-align: top;
+    padding-bottom: .2em;
+    padding-left: .2em;
+}
+
+.tableCard::-webkit-scrollbar {
+    width: 0.2em;
+    border-right: unset;
+}
+
+.tableCard::-webkit-scrollbar-track {
+    overflow: hidden;
+    border: unset;
+    border-radius: unset;
+}
+
+.tableCard::-webkit-scrollbar-track-piece:start {
+    border-radius: unset;
+    background: var(--border-gradient);
+    overflow: hidden;
+    border-left: unset;
+    width: .2em;
+    border-right: .2em solid(--theme-dark);
+}
+
+.tableCard::-webkit-scrollbar-track-piece:end {
+    border-radius: unset;
+    width: .2em;
+    background: var(--bg-primalt);
+    overflow: hidden;
+    border-left: unset;
+    border-right: .2em solid(--theme-dark);
+}
+
+.tableCard::-webkit-scrollbar-thumb {
+    background: var(--theme-bright);
+    border-radius: 2px;
+    border-left: unset;
+    box-shadow: unset;
+}
+
+/*Tall table */
+
+.tableCard.tall {
+    grid-row-end: span 2;
+    max-height: unset;
+}
+
+/* itemCard */
+
+.itemCard {
+    overflow-y: scroll;
+}
+
+.itemCard th {
+    text-align: left;
+    vertical-align: top;
+    color: #fdfdfd;
+}
+
+.itemCard td {
+    text-align: right;
+    overflow-x: auto;
+    display: table-cell;
+}
+
+table.itemTable {
+    width: 97%;
+    height: initial;
+    overflow: hidden;
+    table-layout: fixed;
+    border-collapse: collapse;
+    padding: 5px;
+    margin: 0.3em;
+}
+
+/*itemCard Table content*/
+
+div.itemCard table.table {
+    table-layout: auto;
+    margin: auto;
+    width: 99%;
+}
+
+.itemCard table.table tbody tr:nth-child(odd) {
+    background: var(--bg-primary)
+}
+
+.itemCard table.table tbody tr {
+    white-space: pre;
+    overflow-y: hidden;
+}
+
+.itemCard table td {
+    padding: .4em 0;
+}
+
+div.itemCard>table.table td {
+    white-space: nowrap;
+}
+
+div.itemCard>table tr th:last-child {
+    text-align: right;
+}
+
+div.itemCard>table tr td:first-child {
+    text-align: left;
+}
+
+::-webkit-scrollbar-track-piece:start {
+    background: var(--border-gradient);
+    /* border-left: 0.7rem var(--theme-bright) solid; */
+    border-radius: .5em;
+}
+
+::-webkit-scrollbar-track-piece:end {
+    border-radius: .1em;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--theme-bright);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    overflow: hidden;
+    width: 0.3rem;
+}
+
+::-webkit-scrollbar {
+    width: 0.2rem;
+    height: 0;
+}
+
+h1#sessionName {
+    font-size: 15;
+    margin: 0;
+    display: inline-block;
+}
+
+h1#sessionName::before {
+    content: 'SID : ';
+}
+
+div.sessionList {
+    display: inline-block;
+    position: absolute;
+    margin: 0;
+    height: 4em;
+    right: 1%;
+}
+
+.navBar {
+    height: 2em;
+}
