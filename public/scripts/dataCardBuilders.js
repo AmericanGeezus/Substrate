@@ -55,5 +55,7 @@ function makeItem(data) {
 }
 
 function makeMetricLI(data){
+var ol = document.getElementById("metricsList")
+var li = document.createElement("li")
 
 }

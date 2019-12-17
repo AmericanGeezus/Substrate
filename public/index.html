@@ -16,7 +16,9 @@
             <p class="metric">Global socket count: <span id="socketCount"></span></p>   
         </div>  
     </div>
-
+    <div class="listHolder">
+        <ol id="metricsList"></ol>
+    </div>
     <div class="themeButton">
         <span class="tooltip-wrapper">
             <p class="toolTip">Green</p>
@@ -51,10 +53,16 @@
 
     <script src="/scripts/socket.io.js"></script>
     <script>
-        var conMetrics = {}
+        var conMetrics = {
+            ip:'',
+            SID:'',
+            latency:0,
+        };
+
         const socket = io.connect();
         socket.on('connect', () =>{
             conMetrics.ip = socket.ip
+            conMetrics.SID = socket.id
         })
 
 
