@@ -1,5 +1,6 @@
 node_modules/
 .npm
 .vscode
-configs\Certs\cert.key
-configs\Certs\cert.cert
+configs/Certs/cert.cer
+configs/Certs/cert.key
+configs/Certs/
