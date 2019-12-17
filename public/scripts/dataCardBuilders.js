@@ -54,8 +54,14 @@ function makeItem(data) {
     return newTable
 }
 
-function makeMetricLI(data){
+function makeMetricLI(){
 var ol = document.getElementById("metricsList")
 var li = document.createElement("li")
-
+var sp = document.createElement("span")
+sp.id = conMetrics.SID+"ms"
+sp.textContent = conMetrics.latency+"ms"
+li.textContent = conMetrics.ip + " : "
+li.appendChild(sp)
+li.id = conMetrics.SID
+ol.appendChild(li)
 }

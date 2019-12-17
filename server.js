@@ -49,13 +49,11 @@ var sessionList = []
 var socketCount = 0
 
 io.on('connection',(socket)=>{
-
     socketCount++
     clientIP = socket.request.connection.remoteAddress
     var vitals = {}
     vitals.clientIP = clientIP
     vitals.socketCount = socketCount
-    
     console.log('Connection from '+clientIP)
     io.emit('updateCount',vitals)
     socket.on('newSID',(sid)=>{
@@ -64,7 +62,6 @@ io.on('connection',(socket)=>{
         console.log("socket joined : "+sid
         );
     })
-
     socket.on('requestSessionList',()=>{
         socket.emit('requestSessionListResponse',sessionList)
         

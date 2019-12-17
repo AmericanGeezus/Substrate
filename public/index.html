@@ -52,26 +52,29 @@
     </div>
 
     <script src="/scripts/socket.io.js"></script>
+
     <script>
         var conMetrics = {
             ip:'',
             SID:'',
             latency:0,
         };
+        var ms
 
         const socket = io.connect();
         socket.on('connect', () =>{
             conMetrics.ip = socket.ip
             conMetrics.SID = socket.id
-        })
-
-
+            setTimeout(makeMetricLI,6000)
+            setTimeout(function(){ms = document.getElementById("".concat(conMetrics.SID,"ms"))},10000)
+            console.log(ms)})
+       
         window.addEventListener("beforeunload", function () {
             socket.close();
         })
-        window.bef
+   
     </script>
-    <script src="./scripts/dataCardBuilders.js"></script>
+    <script src="./scripts/dataCardBuilders.js"></script>    
     <script src="/main.js"></script>
     <script src="./scripts/events.js"></script>
 

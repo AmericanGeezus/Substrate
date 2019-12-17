@@ -2,6 +2,18 @@
     box-sizing: border-box;
 }
 
+.listHolder > ol > li {
+    color: #5470b6;
+}
+
+.listHolder {
+    width: 25%;
+    display: inline-block;
+    bottom: 1.5em;
+    position: absolute;
+    color: var(--bg-darkblue);
+}
+
 body {
     font-family: monospace;
     height: 100%;

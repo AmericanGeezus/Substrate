@@ -66,5 +66,7 @@ socket.on('updateCount',(vitals)=>{
 
 socket.on('pong',(data)=>{
     conMetrics.latency = data
+    ms.textContent = data+"ms"
     console.log(conMetrics)
+
 })
