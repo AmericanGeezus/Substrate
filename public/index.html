@@ -1,24 +1,26 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Substrate</title>
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-    <link id="theme" rel="stylesheet" href="./css/green.css">
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link id="theme" rel="stylesheet" href="./css/green.css" />
+    <link rel="stylesheet" href="./css/style.css" />
 </head>
 
 <body>
-
     <div class="main">
         <div id="cardContainer"></div>
+        <div class="listHolder">
+            <ol id="metricsList"></ol>
+        </div>
         <div class="navBar">
-            <p class="metric">Global socket count: <span id="socketCount"></span></p>   
-        </div>  
+            <p class="metric">
+                Global socket count: <span id="socketCount"></span>
+            </p>
+        </div>
     </div>
-    <div class="listHolder">
-        <ol id="metricsList"></ol>
-    </div>
+
     <div class="themeButton">
         <span class="tooltip-wrapper">
             <p class="toolTip">Green</p>
@@ -55,30 +57,34 @@
 
     <script>
         var conMetrics = {
-            ip:'',
-            SID:'',
-            latency:0,
+            ip: "",
+            SID: "",
+            latency: 0
         };
-        var ms
+        var ms;
 
         const socket = io.connect();
-        socket.on('connect', () =>{
-            conMetrics.ip = socket.ip
-            conMetrics.SID = socket.id
-            setTimeout(makeMetricLI,6000)
-            setTimeout(function(){ms = document.getElementById("".concat(conMetrics.SID,"ms"))},10000)
-            console.log(ms)})
-       
+        socket.on("connect", () => {
+            conMetrics.ip = socket.ip;
+            conMetrics.SID = socket.id;
+            setTimeout(makeMetricLI, 6000);
+            setTimeout(function () {
+                ms = document.getElementById("".concat(conMetrics.SID, "ms"));
+            }, 10000);
+            console.log(ms);
+        });
+
         window.addEventListener("beforeunload", function () {
             socket.close();
-        })
-   
+        });
     </script>
-    <script src="./scripts/dataCardBuilders.js"></script>    
+    <script src="./scripts/dataCardBuilders.js"></script>
     <script src="/main.js"></script>
     <script src="./scripts/events.js"></script>
 
-    <script>window.onload = getUserTheme</script>
+    <script>
+        window.onload = getUserTheme;
+    </script>
 </body>
 
 </html>

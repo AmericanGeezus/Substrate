@@ -4,13 +4,15 @@
 
 .listHolder > ol > li {
     color: #5470b6;
+    list-style-image: url("Salty.png");
 }
 
 .listHolder {
     width: 25%;
     display: inline-block;
     bottom: 1.5em;
-    position: absolute;
+    position: sticky;
+    left: 1.01em;
     color: var(--bg-darkblue);
 }
 
@@ -224,6 +226,7 @@ div.tableCard td {
 }
 
 .tableCard th {
+    color: #fdfdfd;
     text-align: left;
     overflow-wrap: normal;
     overflow: hidden;
