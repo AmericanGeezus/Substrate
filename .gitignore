@@ -1,6 +1,3 @@
 node_modules/
 .npm
 .vscode
-
-git filter-branch --force --index-filter \
-  "git rm --cached --ignore-unmatch configs\Certs\cert.cer" \
