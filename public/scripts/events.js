@@ -45,11 +45,7 @@ function setSessionName(ele){
 }
 
 function updateSessionList(){
-    
     socket.emit('requestSessionList',{Get:"Session List"})
-
-
-
 };
 
 socket.on('requestSessionListResponse',(sessionList)=>{
@@ -60,4 +56,15 @@ socket.on('requestSessionListResponse',(sessionList)=>{
         roomlist.appendChild(li)
     });
 
+})
+
+socket.on('updateCount',(vitals)=>{
+  document.getElementById('socketCount').textContent = vitals.socketCount
+  conMetrics.ip = vitals.clientIP
+  console.log(vitals);
+})
+
+socket.on('pong',(latency)=>{
+    conMetrics.latency = latency
+    console.log(conMetrics)
 })

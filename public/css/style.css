@@ -12,16 +12,15 @@ body {
 }
 
 div.navBar p {
-    font-size: 15;
-    color: var(--theme-bright);
-    background: black;
-    width: 33%;
+    font-size: 12.7px;
+    color: #cde8f35e;
+    /* background: black; */
     display: inline-block;
     margin: 0;
-    top: 4.2em;
     position: absolute;
-    z-index: 0;
-    left: 0.8em;
+    z-index: 9999;
+    width: 13em;
+    right: -0.5em;
 }
 
 :root {
@@ -144,9 +143,9 @@ div#cardContainer {
     display: block;
     width: 100%;
     overflow-y: scroll;
-    height: 90%;
+    height: 95%;
     background: var(--bg-darkBlue);
-    margin-top: 0.6em;
+    margin-top: 0.1em;
     border: 0.1rem solid var(--theme-dark);
     border-right: .1rem solid var(--theme-dark);
 }
@@ -372,5 +371,7 @@ div.sessionList {
 }
 
 .navBar {
-    height: 2em;
+    height: 1em;
+    position: sticky;
+    bottom: 0em;
 }

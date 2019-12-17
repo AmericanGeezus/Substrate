@@ -1,3 +1,4 @@
+
 const fs = require('fs')
 const config = require('./configs/config')
 const express = require('express');
@@ -45,32 +46,45 @@ console.log(req.ip)
 })
 
 var sessionList = []
+var socketCount = 0
 
 io.on('connection',(socket)=>{
 
-
+    socketCount++
+    clientIP = socket.request.connection.remoteAddress
+    var vitals = {}
+    vitals.clientIP = clientIP
+    vitals.socketCount = socketCount
+    
+    console.log('Connection from '+clientIP)
+    io.emit('updateCount',vitals)
     socket.on('newSID',(sid)=>{
         sessionList.push(String(sid))
         socket.join(String(sid))
-        console.log("socket joined : "+sid);
-       
-
+        console.log("socket joined : "+sid
+        );
     })
-
 
     socket.on('requestSessionList',()=>{
         socket.emit('requestSessionListResponse',sessionList)
-
+        
     });
 
+    socket.on('disconnect',()=>{ 
+        socketCount-- 
+        console.log("Socket disconnect :"+clientIP)
+        io.emit('updateCount',socketCount)
+        socket.disconnect(true)
+        
+    })
 
+    
 })
 
 
 
 //server start
 
-httpsServer.listen(config.port, function(){
-
+httpsServer.listen(config.port,'0.0.0.0', function(){
     console.log("Server running at https://geezus.net:"+config.port)
 });

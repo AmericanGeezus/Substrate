@@ -1,4 +1,5 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Substrate</title>
@@ -6,47 +7,67 @@
     <link id="theme" rel="stylesheet" href="./css/green.css">
     <link rel="stylesheet" href="./css/style.css">
 </head>
+
 <body>
-<!-- <div class="navBar">
-    <p id="sessionInformText">Please provide a reference phrase,string,ID for referencing this session in the future. It should not contain spaces or special charecters.</p>
-    <h1 class="nav" id="sessionName"></h1>
-    <input placeholder="Only [a-Z][0-9]" id="sessionNameInput" type="text" onchange="setSessionName(this)"></input>
 
-</div> -->
-<div class="main"><div id="cardContainer"></div></div>
+    <div class="main">
+        <div id="cardContainer"></div>
+        <div class="navBar">
+            <p class="metric">Global socket count: <span id="socketCount"></span></p>   
+        </div>  
+    </div>
 
+    <div class="themeButton">
+        <span class="tooltip-wrapper">
+            <p class="toolTip">Green</p>
+        </span>
+        <button class="theme" id="green" onclick="onThemeSelection(this)"></button>
+    </div>
+    <div class="themeButton">
+        <span class="tooltip-wrapper">
+            <p class="toolTip">Pink</p>
+        </span>
+        <button class="theme" id="pink" onclick="onThemeSelection(this)"></button>
+    </div>
+    <div class="themeButton">
+        <span class="tooltip-wrapper">
+            <p class="toolTip tall">Winning Move</p>
+        </span>
+        <button class="theme" id="gtnw" onclick="onThemeSelection(this)"></button>
+    </div>
+    <div class="themeButton">
+        <span class="tooltip-wrapper">
+            <p class="toolTip tall">RedBlue</p>
+        </span>
+        <button class="theme" id="redBlue" onclick="onThemeSelection(this)"></button>
+    </div>
 
-<div class="themeButton">
-<span class="tooltip-wrapper"><p class="toolTip">Green</p></span>
-<button class="theme" id="green" onclick="onThemeSelection(this)"></button>
-</div>
-<div class="themeButton">
-<span class="tooltip-wrapper"><p class="toolTip">Pink</p></span>
-<button class="theme" id="pink" onclick="onThemeSelection(this)"></button>
-</div>
-<div class="themeButton">
-<span class="tooltip-wrapper"><p class="toolTip tall">Winning Move</p></span>
-<button class="theme" id="gtnw" onclick="onThemeSelection(this)"></button>
-</div>
-<div class="themeButton">
-    <span class="tooltip-wrapper"><p class="toolTip tall">RedBlue</p></span>
-    <button class="theme" id="redBlue" onclick="onThemeSelection(this)"></button>
-</div>
-
-<div class="themeButton">
-        <span class="tooltip-wrapper"><p class="toolTip tall">Legacy</p></span>
+    <div class="themeButton">
+        <span class="tooltip-wrapper">
+            <p class="toolTip tall">Legacy</p>
+        </span>
         <button class="theme" id="term" onclick="onThemeSelection(this)"></button>
-</div>
+    </div>
 
-<script src="/scripts/socket.io.js"></script>
-<script>
-const socket = io.connect();
+    <script src="/scripts/socket.io.js"></script>
+    <script>
+        var conMetrics = {}
+        const socket = io.connect();
+        socket.on('connect', () =>{
+            conMetrics.ip = socket.ip
+        })
 
-</script>
-<script src="./scripts/dataCardBuilders.js"></script>
-<script src="/main.js"></script>
-<script src="./scripts/events.js"></script>
 
- <script>window.onload=getUserTheme</script>
+        window.addEventListener("beforeunload", function () {
+            socket.close();
+        })
+        window.bef
+    </script>
+    <script src="./scripts/dataCardBuilders.js"></script>
+    <script src="/main.js"></script>
+    <script src="./scripts/events.js"></script>
+
+    <script>window.onload = getUserTheme</script>
 </body>
+
 </html>
