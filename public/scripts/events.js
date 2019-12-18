@@ -13,7 +13,6 @@ if(document.cookie.length > 1){
 }
 }
 //Theme button select handler + cookie setter
-
 function onThemeSelection(element){
     var selection = element.id
     var styleSheetLink = "./css/"+selection+".css"
@@ -21,7 +20,6 @@ function onThemeSelection(element){
     var currentDate = new Date()
     document.cookie = "theme="+styleSheetLink+"; expires="+currentDate.addDays(5)+";"
 }
-
 
 //get user session name
 function setSessionName(ele){

@@ -4,16 +4,16 @@
 
 .listHolder > ol > li {
     color: #5470b6;
-    list-style-image: url("Salty.png");
+    list-style-image: url("Salty.svg");
 }
 
 .listHolder {
-    width: 25%;
-    display: inline-block;
-    bottom: 1.5em;
     position: sticky;
-    left: 1.01em;
+    left: 0.01em;
     color: var(--bg-darkblue);
+    display: inline-block;
+    bottom: 0em;
+    margin: unset;
 }
 
 body {
@@ -389,4 +389,7 @@ div.sessionList {
     height: 1em;
     position: sticky;
     bottom: 0em;
+    margin: 0px;
+    display: inline-block;
+    left: 101%;
 }

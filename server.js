@@ -56,6 +56,7 @@ io.on('connection',(socket)=>{
     vitals.socketCount = socketCount
     console.log('Connection from '+clientIP)
     io.emit('updateCount',vitals)
+    
     socket.on('newSID',(sid)=>{
         sessionList.push(String(sid))
         socket.join(String(sid))
