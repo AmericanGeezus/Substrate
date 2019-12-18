@@ -67,8 +67,8 @@
         var ms;
 
         const socket = io.connect();
-        socket.on("connect", () => {
-          
+        socket.on("connect", (socket) => {
+            conMetrics.ip = socket.ip
             conMetrics.SID = socket.id;
             setTimeout(makeMetricLI(conMetrics), 6000);
             setTimeout(function () {
