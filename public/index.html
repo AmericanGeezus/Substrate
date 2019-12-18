@@ -59,22 +59,26 @@
         var conMetrics = {
             ip: "",
             SID: "",
-            latency: 0
+            latency: 0,
+            get ident(){
+                return this.SID + "ms";
+            }
         };
         var ms;
 
         const socket = io.connect();
         socket.on("connect", () => {
-            conMetrics.ip = socket.ip;
+          
             conMetrics.SID = socket.id;
-            setTimeout(makeMetricLI, 6000);
+            setTimeout(makeMetricLI(conMetrics), 6000);
             setTimeout(function () {
-                ms = document.getElementById("".concat(conMetrics.SID, "ms"));
+                ms = document.getElementById(conMetrics.ident);
             }, 10000);
             console.log(ms);
         });
 
         window.addEventListener("beforeunload", function () {
+            socket.emit("clientDisco",conMetrics.SID)
             socket.close();
         });
     </script>

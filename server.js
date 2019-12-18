@@ -50,13 +50,17 @@ var socketCount = 0
 
 io.on('connection',(socket)=>{
     socketCount++
-    clientIP = socket.request.connection.remoteAddress
+    var clientIP = socket.request.connection.remoteAddress
     var vitals = {}
     vitals.clientIP = clientIP
     vitals.socketCount = socketCount
     console.log('Connection from '+clientIP)
     io.emit('updateCount',vitals)
-    
+
+    socket.on('clientDisco',(SID)=>{
+      
+    })
+
     socket.on('newSID',(sid)=>{
         sessionList.push(String(sid))
         socket.join(String(sid))

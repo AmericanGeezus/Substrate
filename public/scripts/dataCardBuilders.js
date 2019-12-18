@@ -54,7 +54,7 @@ function makeItem(data) {
     return newTable
 }
 
-function makeMetricLI(){
+function makeMetricLI(conMetrics){
 var ol = document.getElementById("metricsList")
 var li = document.createElement("li")
 var sp = document.createElement("span")
