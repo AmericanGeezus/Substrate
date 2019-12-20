@@ -56,36 +56,35 @@
     <script src="/scripts/socket.io.js"></script>
 
     <script>
-        var conMetrics = {
+        const conMetrics = {
             ip: "",
             SID: "",
             latency: 0,
-            get ident(){
-                return this.SID + "ms";
-            }
+            ident: ""
         };
-        var ms;
+       
 
         const socket = io.connect();
         socket.on("connect", () => {
             conMetrics.SID = socket.id;
-            setTimeout(makeMetricLI(conMetrics), 6000);
-            setTimeout(function () {
-                ms = document.getElementById(conMetrics.ident);
-            }, 10000);
-            console.log(ms);
+            if(conMetrics.ident === ""){
+            conMetrics.ident = socket.id+"ms"
+            };
+            
         });
-
+      
         window.addEventListener("beforeunload", function () {
             socket.emit("clientDisco",conMetrics.SID)
             socket.close();
         });
+        
     </script>
     <script src="./scripts/dataCardBuilders.js"></script>
     <script src="/main.js"></script>
     <script src="./scripts/events.js"></script>
 
     <script>
+        setTimeout(function(){makeMetricLI(conMetrics)},5000);
         window.onload = getUserTheme;
     </script>
 </body>

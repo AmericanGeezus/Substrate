@@ -34,7 +34,7 @@ function makeTable(data){
 function makeItem(data) {
     var newTable = document.createElement('table')
     newTable.classList = 'itemTable'
-    var newColGroup =document.createElement('colgroup')
+    var newColGroup = document.createElement('colgroup')
     newColGroup.innerHTML = '<col class="itemHeader"> <col class="itemData">'
     newTable.append(newColGroup)
 
@@ -54,11 +54,13 @@ function makeItem(data) {
     return newTable
 }
 
+
+
 function makeMetricLI(conMetrics){
 var ol = document.getElementById("metricsList")
 var li = document.createElement("li")
 var sp = document.createElement("span")
-sp.id = conMetrics.SID+"ms"
+sp.id = conMetrics.ident
 sp.textContent = conMetrics.latency+"ms"
 li.textContent = conMetrics.ip + " : "
 li.appendChild(sp)

@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+.listHolder >* {
+    margin: unset;
+}
+
 .listHolder > ol > li {
     color: #5470b6;
     list-style-image: url("Salty.svg");
@@ -31,6 +35,7 @@ div.navBar p {
     /* background: black; */
     display: inline-block;
     margin: 0;
+    bottom:0;
     position: absolute;
     z-index: 9999;
     width: 13em;

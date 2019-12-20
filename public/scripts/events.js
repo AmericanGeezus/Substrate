@@ -57,14 +57,16 @@ socket.on('requestSessionListResponse',(sessionList)=>{
 })
 
 socket.on('updateCount',(vitals)=>{
+  console.log(vitals)
   document.getElementById('socketCount').textContent = vitals.socketCount
   conMetrics.ip = vitals.clientIP
-  console.log(vitals);
+
 })
 
-socket.on('pong',(data)=>{
-    conMetrics.latency = data
-    ms.textContent = data+"ms"
-    console.log(conMetrics)
 
+socket.on('pong',(data)=>{
+    ms = document.getElementById(conMetrics.ident);
+    conMetrics.latency = data
+    ms.textContent = conMetrics.latency + "ms"
+    console.log(conMetrics)
 })
