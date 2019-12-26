@@ -62,8 +62,26 @@
             latency: 0,
             ident: ""
         };
-       
 
+        const metricHandler = {
+            set: (target,prop,value,receiver)=>{
+                if(prop == 'latency'){
+                    ms = document.getElementById(metrics.ident)
+                    ms.innerText = value+"ms";
+                    console.log('Latency Updated.');
+                    target[prop]=value;
+                    return true
+                }
+                else{
+                target[prop] = value;
+                console.log(prop + 'updated.' + 'New value : '+ value);
+                return true;
+                }
+            } 
+        }
+
+        let metrics = new Proxy(conMetrics,metricHandler)
+    
         const socket = io.connect();
         socket.on("connect", () => {
             conMetrics.SID = socket.id;
@@ -82,9 +100,12 @@
     <script src="./scripts/dataCardBuilders.js"></script>
     <script src="/main.js"></script>
     <script src="./scripts/events.js"></script>
-
     <script>
-        setTimeout(function(){makeMetricLI(conMetrics)},5000);
+        setTimeout(function(){
+            makeMetricLI(conMetrics); 
+        },5000);
+
+
         window.onload = getUserTheme;
     </script>
 </body>

@@ -18,7 +18,7 @@ app.use(bodyParser.json({limit:'5mb'}))
 
 app.post('/push',(req,res)=>{
     res.setHeader('Connection','Close')
-    console.log(req.headers["user-agent"])
+    console.log(req.connection.remoteAddress)
     io.emit('console',req.body)
     res.json({Msg:"Received data."})
 })

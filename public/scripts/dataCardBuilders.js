@@ -1,4 +1,3 @@
-
 function makeTable(data){
 
     var newTable = document.createElement('table')
@@ -32,6 +31,7 @@ function makeTable(data){
 }
 
 function makeItem(data) {
+    
     var newTable = document.createElement('table')
     newTable.classList = 'itemTable'
     var newColGroup = document.createElement('colgroup')
@@ -39,7 +39,7 @@ function makeItem(data) {
     newTable.append(newColGroup)
 
     dataLength = Object.keys(data).length
-
+    
     for(var i = 0; i < dataLength;i++){
         var newRow = document.createElement('tr')
         var newTH = document.createElement('th')
@@ -54,16 +54,14 @@ function makeItem(data) {
     return newTable
 }
 
-
-
-function makeMetricLI(conMetrics){
+function makeMetricLI(metrics){
 var ol = document.getElementById("metricsList")
 var li = document.createElement("li")
 var sp = document.createElement("span")
-sp.id = conMetrics.ident
-sp.textContent = conMetrics.latency+"ms"
-li.textContent = conMetrics.ip + " : "
+sp.id = metrics.ident
+sp.textContent = metrics.latency+"ms"
+li.textContent = metrics.ip + " : "
 li.appendChild(sp)
-li.id = conMetrics.SID
+li.id = metrics.SID
 ol.appendChild(li)
 }
