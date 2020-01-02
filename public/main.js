@@ -1,29 +1,32 @@
 
 var container = document.getElementById('cardContainer');
-
+const longValueLength = 15
+var longKeys = []
 var sessionName = ""
+var longValues = false
+var cardCount = 0
 
-const markLongValue = function (element){
-    element.classList = element.classList + " longValue"
-} 
+
+function handleDblClick(element){
+    const selection = window.getSelection()
+    selection.removeAllRanges();
+    const range = document.createRange()
+    range.selectNodeContents(element)
+    selection.addRange(range)
+}
+function handleClick(element){
+    const selection = window.getSelection()
+    selection.removeAllRanges();
+    const range = document.createRange()
+    range.selectNodeContents(element)
+    selection.addRange(range)
+}
+
+
 socket.on('console', function (data) {
-
-    var longValue = false
-    var longKey 
-
 
     var newDataCard = document.createElement('div')
     if (Array.isArray(data)) {
-    for (let [key,value] of Object.entries(...data)){   
-        console.log(key + " : " + value)
-        if(value.length >= 14 || key.length >=14 ){
-            console.log("Long value : " + key)
-            longValue = true
-            longKey = key
-        }
-    }
-
-
         if (Object.keys(data[0]).length <= 3 ) {
             newDataCard.classList = "itemCard"
         } else {
@@ -35,25 +38,24 @@ socket.on('console', function (data) {
         }
 
         newDataCard.appendChild(makeTable(data))
-
-        if(longValue = true){
-            markLongValue(newDataCard)
-        }
+        newDataCard.id = "DataCard_" + cardCount
+        //registerMouseEvents(newDataCard)
         container.appendChild(newDataCard);
+        cardCount++
     } else {
 
         newDataCard.classList = "itemCard"
         newDataCard.appendChild(makeItem(data))
-       
-        if(longValue = true){
-            markLongValue(newDataCard)
-        }
-
+        cardCount++
+        //registerMouseEvents(newDataCard)
         container.appendChild(newDataCard);
-       
-    }
     
-    longKey = ""
-    longValue = false
+    }
+   
+    if(longKeys.length > 0){
+        longKeys = [...new Set(longKeys)]
+      
+        longKeys.forEach(setLongValueClass)
+    }
 
 });
