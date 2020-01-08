@@ -1,4 +1,5 @@
 node_modules/
+node_logs/
 .npm
 .vscode
 configs/Certs/cert.cer
