@@ -6,6 +6,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link id="theme" rel="stylesheet" href="./css/green.css" />
     <link rel="stylesheet" href="./css/style.css" />
+    <script src="/scripts/socket.io.js"></script>
+
 </head>
 
 <body>
@@ -45,7 +47,6 @@
         </span>
         <button class="theme" id="redBlue" onclick="onThemeSelection(this)"></button>
     </div>
-
     <div class="themeButton">
         <span class="tooltip-wrapper">
             <p class="toolTip tall">Legacy</p>
@@ -53,7 +54,7 @@
         <button class="theme" id="term" onclick="onThemeSelection(this)"></button>
     </div>
 
-    <script src="/scripts/socket.io.js"></script>
+    
 
     <script>
         const conMetrics = {
