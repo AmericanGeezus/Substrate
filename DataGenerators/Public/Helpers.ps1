@@ -1,11 +1,6 @@
 function Get-DNSHostEntry([IPAddress]$ip){
-
-
 $result=[System.Net.Dns]::GetHostEntry($ip)
-
 $result.HostName
-
-
 }
 
 
