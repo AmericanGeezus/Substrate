@@ -3,7 +3,6 @@ $result=[System.Net.Dns]::GetHostEntry($ip)
 $result.HostName
 }
 
-
 function Measure-TimeSpan ([DateTime]$Date){
 (Get-Date).Subtract($Date)
 }
