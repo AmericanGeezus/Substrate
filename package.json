@@ -10,11 +10,11 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.16.4",
-    "nodemon": "^1.18.10",
+    "nodemon": "^2.0.2",
     "socket.io": "^2.2.0"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/AmericanGeezus/Substrate"
+    "type": "git",
+    "url": "https://github.com/AmericanGeezus/Substrate"
   }
 }
