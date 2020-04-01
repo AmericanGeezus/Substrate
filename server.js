@@ -31,7 +31,6 @@ app.post('/push/:sid',(req,res)=>{
         Msg:"Server Recieved data.",
         Target:req.params.sid
 })
-})
 
 
 
