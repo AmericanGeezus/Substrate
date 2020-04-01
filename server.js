@@ -20,7 +20,7 @@ app.post('/push',(req,res)=>{
     res.setHeader('Connection','Close')
     console.log(req.connection.remoteAddress)
     io.emit('console',req.body)
-    res.json({Msg:"Received data."})
+    res.json({Msg:"Received data."}).end()
 })
 
 app.post('/push/:sid',(req,res)=>{
@@ -30,13 +30,14 @@ app.post('/push/:sid',(req,res)=>{
     res.json({
         Msg:"Server Recieved data.",
         Target:req.params.sid
+}).end()
 })
 
 
 
 app.get('/',(req,res)=>{
 console.log('we have reached this point.')
-res.sendFile('/index.html')
+res.sendFile('/index.html').end()
 try{
 console.log(req.ip)
 }catch(err){
