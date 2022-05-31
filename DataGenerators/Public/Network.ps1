@@ -11,7 +11,7 @@ function Get-FirewallRules {
 #Get-FirewallRules | Send-ToElma
 
 function Get-NetworkTotalTraffic {
-Get-NetAdapterStatistics | select @{n="Received(GB)";e={[MATH]::Round($_.ReceivedBytes /1GB,2)}},@{n="Sent(GB)";e={[MATH]::Round($_.SentBytes /1GB,2)}} | ConvertTo-Json
+Get-NetAdapterStatistics | Select-Object @{n="Received(GB)";e={[MATH]::Round($_.ReceivedBytes /1GB,2)}},@{n="Sent(GB)";e={[MATH]::Round($_.SentBytes /1GB,2)}} | ConvertTo-Json
 
 }
 
@@ -19,7 +19,7 @@ Get-NetAdapterStatistics | select @{n="Received(GB)";e={[MATH]::Round($_.Receive
 #Get-NetworkTotalTraffic | Send-ToElma
 
 function Get-NetworkAdapterInfo {
-Get-NetAdapter | Select Status,LinkSpeed,MacAddress,@{n="ProfileName";e={$_.Name}} | ConvertTo-Json
+Get-NetAdapter | Select-Object Status,LinkSpeed,MacAddress,@{n="ProfileName";e={$_.Name}} | ConvertTo-Json
 }
 
 #example:
@@ -28,7 +28,7 @@ Get-NetAdapter | Select Status,LinkSpeed,MacAddress,@{n="ProfileName";e={$_.Name
 function Get-ActiveTCP([switch]$GroupItems){
 
 
-$connections = Get-NetTCPConnection | where {($_.AppliedSetting -eq "Internet") -and ($_.RemoteAddress -cnotlike "127.0.*")} | Select RemoteAddress, LocalPort, RemotePort,`
+$connections = Get-NetTCPConnection | Where-Object {($_.AppliedSetting -eq "Internet") -and ($_.RemoteAddress -cnotlike "127.0.*")} | Select-Object RemoteAddress, LocalPort, RemotePort,`
 @{n="HostName";e={$(Get-DNSHostEntry -ip $_.RemoteAddress)}},`
 @{n="State";e={$([Enum]::GetName([Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetTCPConnection.State],($_.PSBase.CimInstanceProperties['State'].Value)))}},`
 @{n="OwningProcess";e={$(Get-Process -Id $_.OwningProcess).Name}},
@@ -36,7 +36,7 @@ $connections = Get-NetTCPConnection | where {($_.AppliedSetting -eq "Internet") 
 
 
 if($GroupItems){
-$connections | Group-Object -Property OwningProcess | Sort-Object -Property Count -Descending 
+$connections | Group-Object -Property OwningProcess | Sort-Object -Property Count -Descending
 
 }
 else{

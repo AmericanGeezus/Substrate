@@ -7,7 +7,7 @@ function Send-ToElma {
     .DESCRIPTION
     The cmdlet supports receiving GroupInfo Objects, JSON formatted strings,
     or single string input from the pipeline. Substrate endpoints require JSON
-    formatted data. 
+    formatted data.
     #>
 
 
@@ -34,15 +34,15 @@ function Send-ToElma {
     3 - Continue processing any remaining items in the pipe.
     4 - Break pipeline, send nothing.
 "@
-    
-   
+
+
         $RequestValues = @{
             Method      = "Post"
             ContentType = "application/json; charset=UTF-8"
             URI         = "https://geezus.net:$($port)/push"
         }
 
-    
+
 
         $Combined = @()
 
@@ -52,7 +52,7 @@ function Send-ToElma {
 
 
         if ($SendEach) {
-    
+
             $BodyJson = ($Group.Group | ConvertTo-Json).replace("null", '""')
             Invoke-WebRequest @RequestValues -Body $BodyJson
         }
@@ -73,28 +73,28 @@ function Send-ToElma {
                 Invoke-WebRequest @RequestValues -Body $(($Combined | ConvertTo-Json).replace("null",'""'))
             }
             else {
-                
+
                 try {
-                    $BodyTest = $Body | ConvertFrom-Json -ErrorAction Stop 
+                    $BodyTest = $Body | ConvertFrom-Json -ErrorAction Stop
                     $ValidJson = $True
                 }
                 catch { $ValidJson = $False }
                 try {
-                    $BodyTest = $String | ConvertFrom-Json -ErrorAction Stop 
+                    $BodyTest = $String | ConvertFrom-Json -ErrorAction Stop
                     $ValidJson = $True
                 }
                 catch { $ValidJson = $False }
-            
+
                 if ($ValidJson) {
                     Invoke-WebRequest @RequestValues -Body $($Body -replace "null",'""')
                 }
                 else {
-                    Write-Host "No handing switches were provided and `r`n a Valid JSON string was not supplied. `r`n"
-                    if ($Combined.count > $Body.count) { $Body = $Combined }
+                    Write-Output "No handing switches were provided and `r`n a Valid JSON string was not supplied. `r`n"
+                    if ($Combined.count -gt $Body.count) { $Body = $Combined }
                     $Choice = Read-Host -Prompt $SwitchPrompt
                     Switch ($Choice) {
                         1 { Invoke-WebRequest @RequestValues -Body $(($Body | ConvertTo-Json).replace("null",'""')) }
-                        2 { Write-Host "$($Body| ConvertTo-Json)" }
+                        2 { Write-Output "$($Body| ConvertTo-Json)" }
                         3 { Continue }
                         4 { Break }
                     }

@@ -5,3 +5,4 @@ node_logs/
 configs/Certs/cert.cer
 configs/Certs/cert.key
 configs/Certs/
+humbs.db
